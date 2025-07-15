@@ -1,6 +1,6 @@
 package gift.controller;
 
-import gift.domain.ProductOld;
+import gift.domain.Product;
 import gift.dto.ProductRequest;
 import gift.dto.ProductResponse;
 import gift.service.ProductService;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @Controller
@@ -30,7 +31,7 @@ public class ProductAdminController {
             @RequestParam(required = false) String keyword,
             Model model) {
 
-        List<ProductOld> filtered = productService.findAllProducts(sort, keyword);
+        List<Product> filtered = productService.findAllProducts(sort, keyword);
         List<ProductResponse> products = filtered.stream()
                 .map(ProductResponse::from)
                 .toList();
@@ -42,14 +43,12 @@ public class ProductAdminController {
         return "admin/product/list";
     }
 
-
-
     /**
      * 상품 등록 폼
      */
     @GetMapping("/new")
     public String newForm(Model model) {
-        model.addAttribute("productRequest", new ProductRequest(null, "", 0, ""));
+        model.addAttribute("productRequest", new ProductRequest("", 0, ""));
         return "admin/product/create-product-form";
     }
 
@@ -60,13 +59,9 @@ public class ProductAdminController {
     public String create(@ModelAttribute @Valid ProductRequest request,
                          BindingResult bindingResult,
                          Model model) {
-        /**
-         * 유효성 검사 실패시 BindingResult 를 통해서 오류 정보를 확인하고 처리해줘야한다.
-         * @ModelAttribute + @Valid → BindingResult로 직접 처리해야 한다.
-         */
         if (bindingResult.hasErrors()) {
-            model.addAttribute("productRequest", request); // 입력값 유지
-            model.addAttribute("errors", bindingResult);   // 에러 메시지 전달
+            model.addAttribute("productRequest", request);
+            model.addAttribute("errors", bindingResult);
             return "admin/product/create-product-form";
         }
 
@@ -86,9 +81,8 @@ public class ProductAdminController {
      */
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        ProductOld product = productService.findById(id);
+        Product product = productService.findById(id);
         ProductRequest request = new ProductRequest(
-                product.getCategoryId(),
                 product.getName(),
                 product.getPrice(),
                 product.getImageUrl()
@@ -107,10 +101,10 @@ public class ProductAdminController {
                          BindingResult bindingResult,
                          Model model) {
 
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("productId", id);
-            model.addAttribute("productRequest", request); // 입력값 유지
-            model.addAttribute("errors", bindingResult);   // 에러 메시지 전달
+            model.addAttribute("productRequest", request);
+            model.addAttribute("errors", bindingResult);
             return "admin/product/edit-product-form";
         }
 
@@ -133,5 +127,4 @@ public class ProductAdminController {
         productService.delete(id);
         return "redirect:/admin/products";
     }
-
 }

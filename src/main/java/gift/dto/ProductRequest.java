@@ -4,8 +4,6 @@ import jakarta.validation.constraints.*;
 
 public record ProductRequest(
 
-        Long categoryId,
-
         @NotBlank(message = "상품 이름은 필수입니다.")
         @Size(max = 15, message = "상품 이름은 최대 15자까지 입력 가능합니다.")
         @Pattern(
