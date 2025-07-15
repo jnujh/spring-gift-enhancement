@@ -32,15 +32,6 @@ public class Member {
         return member;
     }
 
-    // DB 에서 조회된 데이터를 복원할 때 사용 (검증 생략)
-    public static Member withId(Long id, String email, String password) {
-        Member member = new Member();
-        member.id = id;
-        member.email = email;
-        member.password = password;
-        return member;
-    }
-
     // 암호화된 비밀번호를 이용해 Member 생성
     public static Member withEncodedPassword(String email, String encodedPassword) {
         validateEmail(email);
