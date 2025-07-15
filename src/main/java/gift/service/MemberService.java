@@ -1,8 +1,8 @@
 package gift.service;
 
-import gift.domain.MemberOld;
+import gift.domain.Member;
 import gift.exception.ForbiddenException;
-import gift.repository.MemberRepositoryOld;
+import gift.repository.MemberJpaRepository;
 import gift.auth.JwtTokenProvider;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,12 +13,12 @@ import java.util.Locale;
 @Service
 public class MemberService {
 
-    private final MemberRepositoryOld memberRepository;
+    private final MemberJpaRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MessageSource messageSource;
 
-    public MemberService(MemberRepositoryOld memberRepository,
+    public MemberService(MemberJpaRepository memberRepository,
                          PasswordEncoder passwordEncoder,
                          JwtTokenProvider jwtTokenProvider,
                          MessageSource messageSource) {
@@ -30,36 +30,27 @@ public class MemberService {
 
     // 회원가입
     public String register(String email, String rawPassword) {
-        // 유효성 검사만 먼저 수행
-        MemberOld.validateForRegister(email, rawPassword);
 
-        // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(rawPassword);
+        Member member = Member.withEncodedPassword(email, encodedPassword);
 
-        // 암호화된 비밀번호로 Member 객체 생성
-        MemberOld member = MemberOld.withEncodedPassword(email, encodedPassword);
-        MemberOld saved = memberRepository.save(member);
-
+        Member saved = memberRepository.save(member);
         return jwtTokenProvider.createToken(saved.getId());
     }
 
     // 로그인
     public String login(String email, String password) {
-        // 1. 이메일로 회원 찾기
-        MemberOld member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new ForbiddenException(getMessage("member.login.failed")));
 
-        // 2. 비밀번호 검증
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new ForbiddenException(getMessage("member.login.failed"));
         }
 
-        // 3. JWT 토큰 생성 및 반환
         return jwtTokenProvider.createToken(member.getId());
     }
 
-    // ID로 회원 조회
-    public MemberOld findById(Long id) {
+    public Member findById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
     }
