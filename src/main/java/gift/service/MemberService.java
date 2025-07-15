@@ -1,6 +1,6 @@
 package gift.service;
 
-import gift.domain.Member;
+import gift.domain.MemberOld;
 import gift.exception.ForbiddenException;
 import gift.repository.MemberRepository;
 import gift.auth.JwtTokenProvider;
@@ -31,14 +31,14 @@ public class MemberService {
     // 회원가입
     public String register(String email, String rawPassword) {
         // 유효성 검사만 먼저 수행
-        Member.validateForRegister(email, rawPassword);
+        MemberOld.validateForRegister(email, rawPassword);
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         // 암호화된 비밀번호로 Member 객체 생성
-        Member member = Member.withEncodedPassword(email, encodedPassword);
-        Member saved = memberRepository.save(member);
+        MemberOld member = MemberOld.withEncodedPassword(email, encodedPassword);
+        MemberOld saved = memberRepository.save(member);
 
         return jwtTokenProvider.createToken(saved.getId());
     }
@@ -46,7 +46,7 @@ public class MemberService {
     // 로그인
     public String login(String email, String password) {
         // 1. 이메일로 회원 찾기
-        Member member = memberRepository.findByEmail(email)
+        MemberOld member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new ForbiddenException(getMessage("member.login.failed")));
 
         // 2. 비밀번호 검증
@@ -59,7 +59,7 @@ public class MemberService {
     }
 
     // ID로 회원 조회
-    public Member findById(Long id) {
+    public MemberOld findById(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
     }

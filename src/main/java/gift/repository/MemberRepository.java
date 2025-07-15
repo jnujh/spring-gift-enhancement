@@ -1,6 +1,6 @@
 package gift.repository;
 
-import gift.domain.Member;
+import gift.domain.MemberOld;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -25,32 +25,32 @@ public class MemberRepository {
     }
 
     // 회원 저장
-    public Member save(Member member) {
+    public MemberOld save(MemberOld member) {
         Map<String, Object> params = Map.of(
                 "email", member.getEmail(),
                 "password", member.getPassword()
         );
 
         Number id = memberInserter.executeAndReturnKey(new MapSqlParameterSource(params));
-        return Member.withId(id.longValue(), member.getEmail(), member.getPassword());
+        return MemberOld.withId(id.longValue(), member.getEmail(), member.getPassword());
     }
 
     // 이메일로 회원 찾기
-    public Optional<Member> findByEmail(String email) {
+    public Optional<MemberOld> findByEmail(String email) {
         String sql = "SELECT * FROM member WHERE email = ?";
-        List<Member> result = jdbcTemplate.query(sql, rowMapper(), email);
+        List<MemberOld> result = jdbcTemplate.query(sql, rowMapper(), email);
         return result.stream().findAny();
     }
 
     // ID로 회원 찾기
-    public Optional<Member> findById(Long id) {
+    public Optional<MemberOld> findById(Long id) {
         String sql = "SELECT * FROM member WHERE id = ?";
-        List<Member> result = jdbcTemplate.query(sql, rowMapper(), id);
+        List<MemberOld> result = jdbcTemplate.query(sql, rowMapper(), id);
         return result.stream().findAny();
     }
 
-    private RowMapper<Member> rowMapper() {
-        return (rs, rowNum) -> Member.withId(
+    private RowMapper<MemberOld> rowMapper() {
+        return (rs, rowNum) -> MemberOld.withId(
                 rs.getLong("id"),
                 rs.getString("email"),
                 rs.getString("password")
