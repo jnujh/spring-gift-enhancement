@@ -12,12 +12,12 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class MemberRepository {
+public class MemberRepositoryOld {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert memberInserter;
 
-    public MemberRepository(JdbcTemplate jdbcTemplate) {
+    public MemberRepositoryOld(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.memberInserter = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("member")

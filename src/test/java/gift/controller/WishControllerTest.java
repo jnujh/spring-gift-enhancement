@@ -2,9 +2,6 @@ package gift.controller;
 
 import gift.domain.Product;
 import gift.dto.WishResponse;
-import gift.repository.MemberRepository;
-import gift.repository.ProductRepository;
-import gift.repository.WishRepository;
 import gift.service.MemberService;
 import gift.service.ProductService;
 import jakarta.annotation.PostConstruct;

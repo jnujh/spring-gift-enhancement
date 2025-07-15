@@ -2,7 +2,7 @@ package gift.service;
 
 import gift.domain.MemberOld;
 import gift.exception.ForbiddenException;
-import gift.repository.MemberRepository;
+import gift.repository.MemberRepositoryOld;
 import gift.auth.JwtTokenProvider;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,12 +13,12 @@ import java.util.Locale;
 @Service
 public class MemberService {
 
-    private final MemberRepository memberRepository;
+    private final MemberRepositoryOld memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MessageSource messageSource;
 
-    public MemberService(MemberRepository memberRepository,
+    public MemberService(MemberRepositoryOld memberRepository,
                          PasswordEncoder passwordEncoder,
                          JwtTokenProvider jwtTokenProvider,
                          MessageSource messageSource) {
