@@ -1,9 +1,9 @@
 package gift.dto;
 
-import gift.domain.Product;
+import gift.domain.ProductOld;
 
 public record ProductResponse(Long id, String name, int price, String imageUrl) {
-    public static ProductResponse from(Product product) {
+    public static ProductResponse from(ProductOld product) {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),

@@ -1,6 +1,6 @@
 package gift.controller;
 
-import gift.domain.Product;
+import gift.domain.ProductOld;
 import gift.dto.ProductRequest;
 import gift.dto.ProductResponse;
 import jakarta.validation.Valid;
@@ -43,7 +43,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
-        Product product = productService.findById(id);
+        ProductOld product = productService.findById(id);
         return ResponseEntity.ok(ProductResponse.from(product));
     }
 
@@ -54,7 +54,7 @@ public class ProductController {
             @RequestParam(defaultValue = "id,asc") String sort,
             @RequestParam(required = false) Long categoryId
     ) {
-        List<Product> products = productService.findAllByPage(page, size, sort, categoryId);
+        List<ProductOld> products = productService.findAllByPage(page, size, sort, categoryId);
         List<ProductResponse> response = products.stream()
                 .map(ProductResponse::from)
                 .toList();

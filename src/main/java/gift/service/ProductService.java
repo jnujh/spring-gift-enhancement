@@ -1,13 +1,12 @@
 package gift.service;
 
-import gift.domain.Product;
+import gift.domain.ProductOld;
 import gift.exception.ProductNotFoundException;
 import gift.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -18,17 +17,17 @@ public class ProductService {
         this.repository = repository;
     }
 
-    public Product create(String name, int price, String imageUrl) {
+    public ProductOld create(String name, int price, String imageUrl) {
         validateNameContainKakao(name);
         return repository.save(name, price, imageUrl);
     }
 
-    public Product findById(Long id) {
+    public ProductOld findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    public List<Product> findAllByPage(int page, int size, String sort, Long categoryId) {
+    public List<ProductOld> findAllByPage(int page, int size, String sort, Long categoryId) {
         return repository.findAll().stream()
                 .filter(product -> categoryId == null || product.getCategoryId().equals(categoryId))
                 .sorted(createComparator(sort))
@@ -38,29 +37,29 @@ public class ProductService {
     }
 
 
-    public List<Product> findAllProducts(String sort, String keyword) {
+    public List<ProductOld> findAllProducts(String sort, String keyword) {
         return repository.findAll().stream()
                 .filter(p -> matchesKeyword(p, keyword))
                 .sorted(createComparator(sort))
                 .toList();
     }
 
-    private boolean matchesKeyword(Product p, String keyword) {
+    private boolean matchesKeyword(ProductOld p, String keyword) {
         if (keyword == null || keyword.isBlank()) return true;
 
         return p.getName().toLowerCase().contains(keyword.toLowerCase()) ||
                 String.valueOf(p.getId()).equals(keyword);
     }
 
-    private Comparator<Product> createComparator(String sort) {
+    private Comparator<ProductOld> createComparator(String sort) {
         String[] parts = sort.split(",");
         String key = parts[0];
         boolean ascending = parts.length < 2 || parts[1].equalsIgnoreCase("asc");
 
-        Comparator<Product> comparator = switch (key) {
-            case "name" -> Comparator.comparing(Product::getName);
-            case "price" -> Comparator.comparingInt(Product::getPrice);
-            default -> Comparator.comparing(Product::getId);
+        Comparator<ProductOld> comparator = switch (key) {
+            case "name" -> Comparator.comparing(ProductOld::getName);
+            case "price" -> Comparator.comparingInt(ProductOld::getPrice);
+            default -> Comparator.comparing(ProductOld::getId);
         };
 
         return ascending ? comparator : comparator.reversed();

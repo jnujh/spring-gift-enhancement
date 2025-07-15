@@ -1,6 +1,6 @@
 package gift.controller;
 
-import gift.domain.Product;
+import gift.domain.ProductOld;
 import gift.dto.WishResponse;
 import gift.service.MemberService;
 import gift.service.ProductService;
@@ -48,7 +48,7 @@ public class WishControllerTest {
     @DisplayName("상품을 찜할 수 있다")
     void addWish() {
         String token = createMemberAndGetToken("test@example.com", "abcd@@1234");
-        Product product = createTestProduct("테스트상품", 1000);
+        ProductOld product = createTestProduct("테스트상품", 1000);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -65,7 +65,7 @@ public class WishControllerTest {
     @DisplayName("같은 상품을 중복 찜하면 409 Conflict가 발생한다")
     void duplicateWish() {
         String token = createMemberAndGetToken("dup@example.com", "abcd@@1234");
-        Product product = createTestProduct("중복상품", 500);
+        ProductOld product = createTestProduct("중복상품", 500);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -85,7 +85,7 @@ public class WishControllerTest {
     @DisplayName("찜한 상품을 위시리스트에서 조회할 수 있다")
     void getWishlist() {
         String token = createMemberAndGetToken("view@example.com", "abcd@@1234");
-        Product product = createTestProduct("조회상품", 700);
+        ProductOld product = createTestProduct("조회상품", 700);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -105,7 +105,7 @@ public class WishControllerTest {
     @DisplayName("찜 항목을 삭제할 수 있다 (멱등성 보장)")
     void removeWish() {
         String token = createMemberAndGetToken("del@example.com", "abcd@@1234");
-        Product product = createTestProduct("삭제상품", 900);
+        ProductOld product = createTestProduct("삭제상품", 900);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -130,7 +130,7 @@ public class WishControllerTest {
     void removeOthersWish() {
         String token1 = createMemberAndGetToken("me@example.com", "abcd@@1234");
         String token2 = createMemberAndGetToken("other@example.com", "abcd@@1234");
-        Product product = createTestProduct("타인상품", 1100);
+        ProductOld product = createTestProduct("타인상품", 1100);
 
         HttpHeaders headers1 = authHeader(token1);
         HttpEntity<Map<String, Object>> req1 = new HttpEntity<>(
@@ -153,7 +153,7 @@ public class WishControllerTest {
         return memberService.register(email, password);
     }
 
-    private Product createTestProduct(String name, int price) {
+    private ProductOld createTestProduct(String name, int price) {
         return productService.create(name, price, "http://image.com/image.jpg");
     }
 

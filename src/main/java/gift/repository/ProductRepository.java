@@ -1,6 +1,6 @@
 package gift.repository;
 
-import gift.domain.Product;
+import gift.domain.ProductOld;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -25,7 +25,7 @@ public class ProductRepository {
     }
 
 
-    public Product save(String name, int price, String imageUrl) {
+    public ProductOld save(String name, int price, String imageUrl) {
         Map<String, Object> params = Map.of(
                 "name", name,
                 "price", price,
@@ -33,12 +33,12 @@ public class ProductRepository {
         );
 
         Number id = productInserter.executeAndReturnKey(new MapSqlParameterSource(params));
-        return Product.of(id.longValue(), name, price, imageUrl);
+        return ProductOld.of(id.longValue(), name, price, imageUrl);
     }
 
-    public Optional<Product> findById(Long id) {
+    public Optional<ProductOld> findById(Long id) {
         String sql = "SELECT * FROM product WHERE id = ?";
-        List<Product> result = jdbcTemplate.query(sql, rowMapper(), id);
+        List<ProductOld> result = jdbcTemplate.query(sql, rowMapper(), id);
         return result.stream().findAny();
     }
 
@@ -48,12 +48,12 @@ public class ProductRepository {
         return Boolean.TRUE.equals(exists);
     }
 
-    public List<Product> findAll() {
+    public List<ProductOld> findAll() {
         return jdbcTemplate.query("SELECT * FROM product", rowMapper());
     }
 
-    private RowMapper<Product> rowMapper() {
-        return (rs, rowNum) -> Product.of(
+    private RowMapper<ProductOld> rowMapper() {
+        return (rs, rowNum) -> ProductOld.of(
                 rs.getLong("id"),
                 rs.getString("name"),
                 rs.getInt("price"),
