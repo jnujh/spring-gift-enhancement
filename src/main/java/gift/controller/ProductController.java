@@ -3,10 +3,10 @@ package gift.controller;
 import gift.domain.Product;
 import gift.dto.ProductRequest;
 import gift.dto.ProductResponse;
+import gift.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import gift.service.ProductService;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
-            @RequestBody ProductRequest request
+            @RequestBody @Valid ProductRequest request
     ) {
         productService.update(id, request.name(), request.price(), request.imageUrl());
         return ResponseEntity.noContent().build();
@@ -38,7 +38,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -51,10 +51,9 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> getByPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String sort,
-            @RequestParam(required = false) Long categoryId
+            @RequestParam(defaultValue = "id,asc") String sort
     ) {
-        List<Product> products = productService.findAllByPage(page, size, sort, categoryId);
+        List<Product> products = productService.findAllByPage(page, size, sort);
         List<ProductResponse> response = products.stream()
                 .map(ProductResponse::from)
                 .toList();

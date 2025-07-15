@@ -2,7 +2,7 @@ package gift.service;
 
 import gift.exception.ProductNotFoundException;
 import gift.repository.ProductRepository;
-import gift.domain.Product;
+import gift.domain.ProductOld;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +26,7 @@ public class ProductServiceTest {
         String imageUrl = "http://example.com/chocopie.jpg";
 
         // when
-        Product result = productService.create(name, price, imageUrl);
+        ProductOld result = productService.create(name, price, imageUrl);
 
         // then
         assertNotNull(result);
@@ -65,7 +65,7 @@ public class ProductServiceTest {
     @Test
     void 상품명에_카카오가_포함되면_업데이트에서도_예외가_발생한다() {
         // given
-        Product saved = productService.create("초코송이", 1000, "http://img.jpg");
+        ProductOld saved = productService.create("초코송이", 1000, "http://img.jpg");
 
         // when & then
         assertThrows(IllegalArgumentException.class, () ->
@@ -75,7 +75,7 @@ public class ProductServiceTest {
     @Test
     void 수정사항이_없어도_예외없이_정상처리된다() {
         // given
-        Product saved = productService.create("몽쉘", 1500, "http://img.jpg");
+        ProductOld saved = productService.create("몽쉘", 1500, "http://img.jpg");
 
         // when & then
         assertDoesNotThrow(() ->
@@ -85,14 +85,14 @@ public class ProductServiceTest {
     @Test
     void 상품이_정상적으로_수정된다() {
         // given
-        Product savedProduct = productService.create("새우깡", 1200, "http://img.jpg");
+        ProductOld savedProduct = productService.create("새우깡", 1200, "http://img.jpg");
 
         // when
         assertDoesNotThrow(() ->
                 productService.update(savedProduct.getId(), "매운 새우깡", 1300, "http://img2.jpg"));
 
         // then
-        Product updatedProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
+        ProductOld updatedProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
         assertEquals("매운 새우깡", updatedProduct.getName());
         assertEquals(1300, updatedProduct.getPrice());
         assertEquals("http://img2.jpg", updatedProduct.getImageUrl());

@@ -1,27 +1,44 @@
 package gift.domain;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "wish")
 public class Wish {
 
-    private final Long id;                    // 찜 항목 고유 ID (wishId)
-    private final Long memberId;              // 사용자 ID (FK to member)
-    private final Long productId;             // 상품 ID (FK to product)
-    private final LocalDateTime createdAt;  // 찜한 시간 (정렬 기준)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private Wish(Long id, Long memberId, Long productId, LocalDateTime createdAt) {
-        this.id = id;
-        this.memberId = memberId;
-        this.productId = productId;
-        this.createdAt = createdAt;
+    // 연관관계: Wish → Member (N:1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    // 연관관계: Wish → Product (N:1)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    protected Wish() {
     }
 
-    public static Wish of(Long id, Long memberId, Long productId, LocalDateTime createdAt) {
-        return new Wish(id, memberId, productId, createdAt);
+    public static Wish create(Member member, Product product) {
+        Wish wish = new Wish();
+        wish.member = member;
+        wish.product = product;
+        return wish;
     }
 
-    public Long getId() { return id; }
-    public Long getMemberId() { return memberId; }
-    public Long getProductId() { return productId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public Long getId() {
+        return id;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
 }
