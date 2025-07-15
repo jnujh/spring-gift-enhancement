@@ -1,6 +1,6 @@
 package gift.service;
 
-import gift.domain.Wish;
+import gift.domain.WishOld;
 import gift.exception.AlreadyWishedException;
 import gift.exception.UnauthorizedWishAccessException;
 import gift.repository.ProductRepository;
@@ -26,7 +26,7 @@ public class WishService {
      * 위시리스트에 상품 추가
      * 이미 찜한 경우 예외 발생
      */
-    public Wish addWish(Long memberId, Long productId) {
+    public WishOld addWish(Long memberId, Long productId) {
 
         if (!productRepository.existsById(productId)) {
             throw new IllegalArgumentException("존재하지 않는 상품입니다.");
@@ -61,7 +61,7 @@ public class WishService {
      * 사용자별 위시리스트 조회
      * 존재하지 않을 경우 빈 리스트 반환
      */
-    public List<Wish> getWishlist(Long memberId) {
+    public List<WishOld> getWishlist(Long memberId) {
         return wishRepository.getWishlistByMemberId(memberId);
     }
 }

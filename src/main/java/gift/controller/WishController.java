@@ -2,7 +2,7 @@ package gift.controller;
 
 import gift.annotation.LoginMember;
 import gift.domain.MemberOld;
-import gift.domain.Wish;
+import gift.domain.WishOld;
 import gift.dto.WishRequest;
 import gift.dto.WishResponse;
 import gift.service.WishService;
@@ -26,7 +26,7 @@ public class WishController {
     @GetMapping
     public ResponseEntity<List<WishResponse>> getWishlist(@LoginMember MemberOld member) {
 
-        List<Wish> wishList = wishService.getWishlist(member.getId());
+        List<WishOld> wishList = wishService.getWishlist(member.getId());
 
         List<WishResponse> response = wishList.stream()
                 .map(WishResponse::from)
@@ -41,7 +41,7 @@ public class WishController {
             @LoginMember MemberOld member
     ) {
 
-        Wish wish = wishService.addWish(member.getId(), request.productId());
+        WishOld wish = wishService.addWish(member.getId(), request.productId());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(WishResponse.from(wish));

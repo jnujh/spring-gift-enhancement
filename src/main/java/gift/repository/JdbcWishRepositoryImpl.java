@@ -1,6 +1,6 @@
 package gift.repository;
 
-import gift.domain.Wish;
+import gift.domain.WishOld;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,8 +24,8 @@ public class JdbcWishRepositoryImpl implements WishRepository {
                 .usingGeneratedKeyColumns("id");
     }
 
-    private RowMapper<Wish> rowMapper() {
-        return (rs, rowNum) -> Wish.of(
+    private RowMapper<WishOld> rowMapper() {
+        return (rs, rowNum) -> WishOld.of(
                 rs.getLong("id"),
                 rs.getLong("member_id"),
                 rs.getLong("product_id"),
@@ -35,7 +35,7 @@ public class JdbcWishRepositoryImpl implements WishRepository {
 
     // 위시리스트에 상품 추가
     @Override
-    public Wish addWish(Long memberId, Long productId) {
+    public WishOld addWish(Long memberId, Long productId) {
         LocalDateTime now = LocalDateTime.now();
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -52,9 +52,9 @@ public class JdbcWishRepositoryImpl implements WishRepository {
 
     // wishId 로 Wish 조회
     @Override
-    public Optional<Wish> findById(Long wishId) {
+    public Optional<WishOld> findById(Long wishId) {
         String sql = "SELECT * FROM wish WHERE id = ?";
-        List<Wish> result = jdbcTemplate.query(sql, rowMapper(), wishId);
+        List<WishOld> result = jdbcTemplate.query(sql, rowMapper(), wishId);
         return result.stream().findAny();
     }
 
@@ -68,7 +68,7 @@ public class JdbcWishRepositoryImpl implements WishRepository {
 
     // 사용자별 위시리스트 조회
     @Override
-    public List<Wish> getWishlistByMemberId(Long memberId) {
+    public List<WishOld> getWishlistByMemberId(Long memberId) {
         String sql = "SELECT * FROM wish WHERE member_id = ? ORDER BY created_date DESC";
         return jdbcTemplate.query(sql, rowMapper(), memberId);
     }
