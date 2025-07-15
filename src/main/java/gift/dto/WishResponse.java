@@ -1,19 +1,15 @@
 package gift.dto;
 
-import gift.domain.WishOld;
-
-import java.time.LocalDateTime;
+import gift.domain.Wish;
 
 public record WishResponse(
         Long wishId,
-        Long productId,
-        LocalDateTime createdAt
+        Long productId
 ) {
-    public static WishResponse from(WishOld wish) {
+    public static WishResponse from(Wish wish) {
         return new WishResponse(
                 wish.getId(),
-                wish.getProductId(),
-                wish.getCreatedAt()
+                wish.getProduct().getId()
         );
     }
 }
