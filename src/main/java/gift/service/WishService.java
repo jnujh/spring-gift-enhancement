@@ -52,14 +52,16 @@ public class WishService {
      * 다른 사용자의 찜 항목은 삭제할 수 없음
      */
     public void removeWish(Long wishId, Long memberId) {
-        wishRepository.findByIdAndMemberId(wishId, memberId)
-                .ifPresent(wish -> {
-                    if (!wish.getMember().getId().equals(memberId)) {
-                        throw new UnauthorizedWishAccessException("다른 사용자의 위시리스트 항목은 삭제할 수 없습니다.");
-                    }
-                    wishRepository.delete(wish);
-                });
-        // 존재하지 않으면 무시 (멱등성 보장)
+        Wish wish = wishRepository.findById(wishId).orElse(null);
+
+        if (wish == null) {
+            // 존재하지 않으면 무시 (멱등성 보장)
+            return;
+        }
+
+        if (!wish.getMember().getId().equals(memberId)) {
+            throw new UnauthorizedWishAccessException("다른 사용자의 위시리스트 항목은 삭제할 수 없습니다.");
+        }
     }
 
     /**
