@@ -4,6 +4,9 @@ import gift.policy.EmailPolicy;
 import gift.policy.PasswordPolicy;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "member")
 public class Member {
@@ -17,6 +20,11 @@ public class Member {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Wish> wishes = new ArrayList<>();
+
+
 
     protected Member() {
     }
@@ -73,5 +81,9 @@ public class Member {
 
     public String getPassword() {
         return password;
+    }
+
+    public List<Wish> getWishes() {
+        return wishes;
     }
 }
