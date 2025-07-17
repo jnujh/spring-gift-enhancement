@@ -7,7 +7,11 @@ import gift.domain.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -23,7 +27,10 @@ public interface WishJpaRepository extends JpaRepository<Wish, Long> {
     // List<Wish> findAllByMemberIdAndOrderByIdDesc(Member member);
 
     // Wish ID + 사용자 ID 기준 삭제
-    void deleteByIdAndMemberId(Long id, Long memberId);
+    @Modifying
+    @Transactional
+    @Query("delete from Wish w where w.id = :id and w.member.id = :memberId")
+    void deleteByIdAndMemberId(@Param("id") Long id, @Param("memberId") Long memberId);
 
     // 사용자 ID 소유의 찜 항목 조회
     Optional<Wish> findByIdAndMemberId(Long id, Long memberId);
