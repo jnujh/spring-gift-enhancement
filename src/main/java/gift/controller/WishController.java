@@ -7,6 +7,10 @@ import gift.dto.WishRequest;
 import gift.dto.WishResponse;
 import gift.service.WishService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +27,17 @@ public class WishController {
     }
 
     /**
-     * 사용자 위시리스트 조회
+     * 사용자 위시리스트 조회 (페이지네이션 적용)
      */
     @GetMapping
-    public ResponseEntity<List<WishResponse>> getWishlist(@LoginMember Member member) {
-        List<Wish> wishList = wishService.getWishlist(member.getId());
+    public ResponseEntity<Page<WishResponse>> getWishlist(@LoginMember Member member,
+                                                          @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<Wish> wishPage = wishService.getWishlist(member.getId(), pageable);
 
-        List<WishResponse> response = wishList.stream()
-                .map(WishResponse::from)
-                .toList();
+        Page<WishResponse> responsePage = wishPage.map(WishResponse::from);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responsePage);
     }
 
     /**
