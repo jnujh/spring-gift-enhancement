@@ -5,6 +5,10 @@ import gift.dto.ProductRequest;
 import gift.dto.ProductResponse;
 import gift.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,21 +31,19 @@ public class ProductAdminController {
      */
     @GetMapping
     public String list(
-            @RequestParam(defaultValue = "id,asc") String sort,
             @RequestParam(required = false) String keyword,
-            Model model) {
-
-        List<Product> filtered = productService.findAllProducts(sort, keyword);
-        List<ProductResponse> products = filtered.stream()
-                .map(ProductResponse::from)
-                .toList();
+            @PageableDefault(size = 3, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+            Model model
+    ) {
+        Page<Product> page = productService.search(keyword, pageable);
+        List<ProductResponse> products = page.map(ProductResponse::from).getContent();
 
         model.addAttribute("products", products);
-        model.addAttribute("sort", sort);
+        model.addAttribute("page", page);
         model.addAttribute("keyword", keyword);
-
         return "admin/product/list";
     }
+
 
     /**
      * 상품 등록 폼

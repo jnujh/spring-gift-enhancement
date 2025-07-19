@@ -1,5 +1,6 @@
 package gift.controller;
 
+import gift.domain.Product;
 import gift.domain.ProductOld;
 import gift.dto.WishResponse;
 import gift.service.MemberService;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.client.HttpClientErrorException;
@@ -48,7 +51,7 @@ public class WishControllerTest {
     @DisplayName("상품을 찜할 수 있다")
     void addWish() {
         String token = createMemberAndGetToken("test@example.com", "abcd@@1234");
-        ProductOld product = createTestProduct("테스트상품", 1000);
+        Product product = createTestProduct("테스트상품", 1000);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -65,7 +68,7 @@ public class WishControllerTest {
     @DisplayName("같은 상품을 중복 찜하면 409 Conflict가 발생한다")
     void duplicateWish() {
         String token = createMemberAndGetToken("dup@example.com", "abcd@@1234");
-        ProductOld product = createTestProduct("중복상품", 500);
+        Product product = createTestProduct("중복상품", 500);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -84,28 +87,39 @@ public class WishControllerTest {
     @Test
     @DisplayName("찜한 상품을 위시리스트에서 조회할 수 있다")
     void getWishlist() {
+        // given
         String token = createMemberAndGetToken("view@example.com", "abcd@@1234");
-        ProductOld product = createTestProduct("조회상품", 700);
+        Product product = createTestProduct("조회상품", 700);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
                 Map.of("productId", product.getId()), headers);
+
         restTemplate.postForEntity(baseUrl, request, WishResponse.class);
 
+        // when
         HttpEntity<Void> getRequest = new HttpEntity<>(headers);
-        ResponseEntity<WishResponse[]> response = restTemplate.exchange(
-                baseUrl, HttpMethod.GET, getRequest, WishResponse[].class);
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl,
+                HttpMethod.GET,
+                getRequest,
+                String.class
+        );
 
+        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotEmpty();
-        assertThat(response.getBody()[0].productId()).isEqualTo(product.getId());
+
+        // JSON 파싱을 통해 상품 ID 포함 여부 확인
+        String responseBody = response.getBody();
+        assertThat(responseBody).contains("\"productId\":" + product.getId());
     }
+
 
     @Test
     @DisplayName("찜 항목을 삭제할 수 있다 (멱등성 보장)")
     void removeWish() {
         String token = createMemberAndGetToken("del@example.com", "abcd@@1234");
-        ProductOld product = createTestProduct("삭제상품", 900);
+        Product product = createTestProduct("삭제상품", 900);
 
         HttpHeaders headers = authHeader(token);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(
@@ -130,7 +144,7 @@ public class WishControllerTest {
     void removeOthersWish() {
         String token1 = createMemberAndGetToken("me@example.com", "abcd@@1234");
         String token2 = createMemberAndGetToken("other@example.com", "abcd@@1234");
-        ProductOld product = createTestProduct("타인상품", 1100);
+        Product product = createTestProduct("타인상품", 1100);
 
         HttpHeaders headers1 = authHeader(token1);
         HttpEntity<Map<String, Object>> req1 = new HttpEntity<>(
@@ -153,7 +167,7 @@ public class WishControllerTest {
         return memberService.register(email, password);
     }
 
-    private ProductOld createTestProduct(String name, int price) {
+    private Product createTestProduct(String name, int price) {
         return productService.create(name, price, "http://image.com/image.jpg");
     }
 

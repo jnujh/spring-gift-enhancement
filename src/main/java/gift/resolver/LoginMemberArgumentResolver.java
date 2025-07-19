@@ -1,7 +1,7 @@
 package gift.resolver;
 
 import gift.annotation.LoginMember;
-import gift.domain.MemberOld;
+import gift.domain.Member;
 import gift.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -22,7 +22,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(LoginMember.class)
-                && parameter.getParameterType().equals(MemberOld.class);
+                && parameter.getParameterType().equals(Member.class);
     }
 
     @Override

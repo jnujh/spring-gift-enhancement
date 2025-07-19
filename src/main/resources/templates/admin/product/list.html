@@ -46,6 +46,29 @@
     </tbody>
 </table>
 
+<!-- 페이지네이션 -->
+<div style="margin-top: 20px;">
+    <div th:if="${page.totalPages > 1}">
+        <ul style="list-style: none; display: flex; gap: 10px; padding: 0;">
+            <!-- 이전 페이지 -->
+            <li th:if="${page.hasPrevious()}">
+                <a th:href="@{/admin/products(page=${page.number - 1}, keyword=${keyword})}">◀ 이전</a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${i == page.number} ? 'active'">
+                <a th:href="@{/admin/products(page=${i}, keyword=${keyword})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- 다음 페이지 -->
+            <li th:if="${page.hasNext()}">
+                <a th:href="@{/admin/products(page=${page.number + 1}, keyword=${keyword})}">다음 ▶</a>
+            </li>
+        </ul>
+    </div>
+</div>
 
 </body>
 </html>

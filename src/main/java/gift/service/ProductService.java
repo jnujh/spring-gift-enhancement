@@ -3,6 +3,8 @@ package gift.service;
 import gift.domain.Product;
 import gift.exception.ProductNotFoundException;
 import gift.repository.ProductJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +14,7 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private final ProductJpaRepository repository;
+    private final ProductJpaRepository  repository;
 
     public ProductService(ProductJpaRepository repository) {
         this.repository = repository;
@@ -31,20 +33,12 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<Product> findAllByPage(int page, int size, String sort) {
-        return repository.findAll().stream()
-                .sorted(createComparator(sort))
-                .skip((long) page * size)
-                .limit(size)
-                .toList();
-    }
+    public Page<Product> search(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.isBlank()) {
+            return repository.findAll(pageable);
+        }
 
-    @Transactional(readOnly = true)
-    public List<Product> findAllProducts(String sort, String keyword) {
-        return repository.findAll().stream()
-                .filter(p -> matchesKeyword(p, keyword))
-                .sorted(createComparator(sort))
-                .toList();
+        return repository.findByNameContainingIgnoreCase(keyword, pageable);
     }
 
     @Transactional
@@ -63,12 +57,6 @@ public class ProductService {
             return; // 멱등성 유지
         }
         repository.deleteById(id);
-    }
-
-    private boolean matchesKeyword(Product p, String keyword) {
-        if (keyword == null || keyword.isBlank()) return true;
-        return p.getName().toLowerCase().contains(keyword.toLowerCase())
-                || String.valueOf(p.getId()).equals(keyword);
     }
 
     private Comparator<Product> createComparator(String sort) {

@@ -6,6 +6,8 @@ import gift.exception.UnauthorizedWishAccessException;
 import gift.repository.MemberJpaRepository;
 import gift.repository.ProductJpaRepository;
 import gift.repository.WishJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,22 +52,27 @@ public class WishService {
      * 다른 사용자의 찜 항목은 삭제할 수 없음
      */
     public void removeWish(Long wishId, Long memberId) {
-        wishRepository.findByIdAndMemberId(wishId, memberId)
-                .ifPresent(wish -> {
-                    if (!wish.getMember().getId().equals(memberId)) {
-                        throw new UnauthorizedWishAccessException("다른 사용자의 위시리스트 항목은 삭제할 수 없습니다.");
-                    }
-                    wishRepository.delete(wish);
-                });
-        // 존재하지 않으면 무시 (멱등성 보장)
+        Wish wish = wishRepository.findById(wishId).orElse(null);
+
+        if (wish == null) {
+            // 존재하지 않으면 무시 (멱등성 보장)
+            return;
+        }
+
+        if (!wish.getMember().getId().equals(memberId)) {
+            throw new UnauthorizedWishAccessException("다른 사용자의 위시리스트 항목은 삭제할 수 없습니다.");
+        }
     }
 
     /**
      * 사용자별 위시리스트 조회
      */
-    public List<Wish> getWishlist(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-        return wishRepository.findAllByMemberOrderByIdDesc(member);
+    public Page<Wish> getWishlist(Long memberId, Pageable pageable) {
+
+        if (!memberRepository.existsById(memberId)) {
+            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
+        }
+
+        return wishRepository.findByMemberId(memberId, pageable);
     }
 }

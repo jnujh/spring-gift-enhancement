@@ -27,6 +27,10 @@ public class Wish {
         Wish wish = new Wish();
         wish.member = member;
         wish.product = product;
+
+        member.getWishes().add(wish);
+        product.getWishes().add(wish);
+
         return wish;
     }
 

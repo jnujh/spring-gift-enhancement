@@ -5,10 +5,13 @@ import gift.dto.ProductRequest;
 import gift.dto.ProductResponse;
 import gift.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -48,15 +51,13 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getByPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,asc") String sort
+    public ResponseEntity<Page<ProductResponse>> getByPage(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) String keyword
     ) {
-        List<Product> products = productService.findAllByPage(page, size, sort);
-        List<ProductResponse> response = products.stream()
-                .map(ProductResponse::from)
-                .toList();
-        return ResponseEntity.ok(response);
+        Page<Product> page = productService.search(keyword, pageable);
+        Page<ProductResponse> responsePage = page.map(ProductResponse::from);
+        return ResponseEntity.ok(responsePage);
     }
+
 }
