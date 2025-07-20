@@ -27,6 +27,9 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wish> wishes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Option> options = new ArrayList<>();
+
     protected Product() {
     }
 
@@ -60,4 +63,5 @@ public class Product {
     public int getPrice() { return price; }
     public String getImageUrl() { return imageUrl; }
     public List<Wish> getWishes() { return wishes; }
+    public List<Option> getOptions() { return options; }
 }
