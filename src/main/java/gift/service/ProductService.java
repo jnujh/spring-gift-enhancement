@@ -59,20 +59,6 @@ public class ProductService {
         repository.deleteById(id);
     }
 
-    private Comparator<Product> createComparator(String sort) {
-        String[] parts = sort.split(",");
-        String key = parts[0];
-        boolean ascending = parts.length < 2 || parts[1].equalsIgnoreCase("asc");
-
-        Comparator<Product> comparator = switch (key) {
-            case "name" -> Comparator.comparing(Product::getName);
-            case "price" -> Comparator.comparingInt(Product::getPrice);
-            default -> Comparator.comparing(Product::getId);
-        };
-
-        return ascending ? comparator : comparator.reversed();
-    }
-
     private void validateNameContainKakao(String name) {
         if (name.contains("카카오")) {
             throw new IllegalArgumentException("'카카오'가 포함된 상품명은 MD와 협의 후 등록 가능합니다.");
