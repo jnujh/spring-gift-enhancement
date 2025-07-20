@@ -1,8 +1,10 @@
 package gift.controller;
 
 import gift.domain.Product;
+import gift.dto.OptionResponse;
 import gift.dto.ProductRequest;
 import gift.dto.ProductResponse;
+import gift.service.OptionService;
 import gift.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -21,9 +23,11 @@ import java.util.List;
 public class ProductAdminController {
 
     private final ProductService productService;
+    private final OptionService optionService;
 
-    public ProductAdminController(ProductService productService) {
+    public ProductAdminController(ProductService productService, OptionService optionService) {
         this.productService = productService;
+        this.optionService = optionService;
     }
 
     /**
@@ -91,6 +95,10 @@ public class ProductAdminController {
         );
         model.addAttribute("productId", product.getId());
         model.addAttribute("productRequest", request);
+
+        List<OptionResponse> options = optionService.getOptionsByProductId(id);
+        model.addAttribute("options", options);
+
         return "admin/product/edit-product-form";
     }
 
