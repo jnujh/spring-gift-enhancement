@@ -2,6 +2,8 @@ package gift.service;
 
 import gift.domain.Option;
 import gift.domain.Product;
+import gift.dto.OptionRequest;
+import gift.dto.ProductRequest;
 import gift.repository.OptionJpaRepository;
 import gift.repository.ProductJpaRepository;
 import jakarta.persistence.EntityManager;
@@ -38,7 +40,19 @@ class OptionServiceTest {
 
     @BeforeEach
     void setUp() {
-        Product product = Product.create("차렵 이불", 10000, "img.jpg");
+        ProductRequest request = new ProductRequest(
+                "차렵 이불",
+                10000,
+                "img.jpg",
+                List.of(new OptionRequest("기본", 100))
+        );
+
+        Product product = Product.create(
+                request.name(),
+                request.price(),
+                request.imageUrl(),
+                request.options()
+        );
         savedProduct = productRepository.save(product);
     }
 
@@ -95,5 +109,16 @@ class OptionServiceTest {
         assertThatThrownBy(() ->
                 optionService.deleteOption(9999L)
         ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void 옵션이_한개뿐이면_삭제할_수_없다() {
+        // given
+        Long optionId = savedProduct.getOptions().get(0).getId();
+
+        // when & then
+        assertThatThrownBy(() -> optionService.deleteOption(optionId))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("상품은 최소 1개의 옵션을 유지해야 하므로 삭제할 수 없습니다.");
     }
 }
