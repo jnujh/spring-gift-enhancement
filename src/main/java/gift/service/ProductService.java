@@ -1,6 +1,7 @@
 package gift.service;
 
 import gift.domain.Product;
+import gift.dto.ProductRequest;
 import gift.exception.ProductNotFoundException;
 import gift.repository.ProductJpaRepository;
 import org.springframework.data.domain.Page;
@@ -21,10 +22,19 @@ public class ProductService {
     }
 
     @Transactional
-    public Product create(String name, int price, String imageUrl) {
-        validateNameContainKakao(name);
-        return repository.save(Product.create(name, price, imageUrl));
+    public Product create(ProductRequest request) {
+        validateNameContainKakao(request.name());
+
+        Product product = Product.create(
+                request.name(),
+                request.price(),
+                request.imageUrl(),
+                request.options()
+        );
+
+        return repository.save(product);
     }
+
 
     @Transactional(readOnly = true)
     public Product findById(Long id) {
