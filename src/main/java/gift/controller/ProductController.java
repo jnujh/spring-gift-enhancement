@@ -32,7 +32,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody @Valid ProductRequest request) {
-        productService.create(request.name(), request.price(), request.imageUrl());
+        productService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
