@@ -14,4 +14,7 @@ public interface OptionJpaRepository extends JpaRepository<Option, Long> {
 
     // 옵션 이름 존재 여부 조회
     boolean existsByProductIdAndName(Long productId, String name);
+
+    // 옵션 개수 조회
+    int countByProductId(Long productId);
 }

@@ -58,9 +58,16 @@ public class OptionService {
     // 옵션 삭제
     @Transactional
     public void deleteOption(Long optionId) {
-        if (!optionRepository.existsById(optionId)) {
-            throw new NoSuchElementException("해당 옵션이 존재하지 않습니다.");
+        Option option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new NoSuchElementException("해당 옵션이 존재하지 않습니다."));
+
+        Long productId = option.getProduct().getId();
+        int count = optionRepository.countByProductId(productId);
+
+        if (count <= 1) {
+            throw new IllegalStateException("상품은 최소 1개의 옵션을 유지해야 하므로 삭제할 수 없습니다.");
         }
+
         optionRepository.deleteById(optionId);
     }
 
